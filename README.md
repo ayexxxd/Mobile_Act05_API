@@ -8,15 +8,10 @@ https://pokeapi.co/api/v2/pokemon?limit=1025
 ## What the app does
 A SwiftUI Pokédex for iOS. It downloads the National Pokédex (#1–#1025) from PokeAPI and shows each Pokémon as a card (sprite, number and name) in a grid of 3 per row. Tapping a card opens a detail screen with a large sprite, the Pokédex number, the name, the Pokédex description and a button that plays the Pokémon's cry.
 
-If the list can't load, the app shows a readable message instead of crashing: "No connection. Please try again." when the device is offline, or the server's error code if the API request fails, with a **Try again** button.
-
-The app follows **MVVM**:
-- **Models** – `Pokemon.swift` (`Pokemon`, `PokeAPIResponse` for the list; `PokemonSpecies`, `FlavorTextEntry`, `Language` for the description and cry)
-- **ViewModels** – `PokemonViewModel.swift` (`getPokemon()` gets the list and sets `errorMessage` if it fails), `PokemonDetailViewModel.swift` (`getDescription(number:)` gets the description, `playCry()` plays the cry)
-- **Views** – `ContentView.swift` (list + error message), `PokemonRowView.swift` (card), `PokemonDetailView.swift` (detail)
+If the list can't load, the app shows a readable message instead of crashing; "No connection. Please try again." when the device is offline, or the server's error code if the API request fails, with a **Try again** button.
 
 ## API
-[PokeAPI](https://pokeapi.co/) – free, no API key needed.
+[PokeAPI](https://pokeapi.co/) – free, no API key needed
 
 | Data | Endpoint |
 |---|---|
