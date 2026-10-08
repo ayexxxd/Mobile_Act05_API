@@ -41,7 +41,7 @@ struct PokemonDetailView: View {
                     .bold()
             }
 
-            //cry tap to hear the pokemon
+            //audio button that plays the cry, it calls playcry in the viewmodel
             Button {
                 detailVM.playCry()
             } label: {
@@ -51,23 +51,14 @@ struct PokemonDetailView: View {
             .buttonStyle(.borderedProminent)
             .tint(.white)
             .foregroundStyle(.red)
-            //greyed out until the species data loads bc thats where the cry link comes from
-            .disabled(detailVM.cryURL == nil)
 
-            //description error text if it failed, otherwise the pokedex text
-            Group {
-                if let error = detailVM.errorMessage {
-                    Text(error)
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text(detailVM.descriptionText)
-                }
-            }
-            .multilineTextAlignment(.center)
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color.white, in: RoundedRectangle(cornerRadius: 16))
-            .padding(.horizontal)
+            //pokedex description from the viewmodel
+            Text(detailVM.descriptionText)
+                .multilineTextAlignment(.center)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color.white, in: RoundedRectangle(cornerRadius: 16))
+                .padding(.horizontal)
 
             //pushes everything to the top of the screen
             Spacer()
@@ -76,9 +67,12 @@ struct PokemonDetailView: View {
         .frame(maxWidth: .infinity)
         .navigationBarTitleDisplayMode(.inline)
         .background(Color.red)
-        //loads the description when the screen opens
-        .task {
-            await detailVM.getDescription(number: pokemon.number)
+        //loads the description and the cry link when the screen opens, same do catch as contentview
+        .task{
+            do{
+                try await detailVM.getDescription(number: pokemon.number)
+            } catch{
+                print ("error calling the description", error)}
         }
     }
 }

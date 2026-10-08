@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+//audio avfoundation is the apple framework that plays sound
 import AVFoundation
 
 //viewmodel for the detail screen, gets the description and plays the cry
@@ -15,51 +16,42 @@ import AVFoundation
 
 class PokemonDetailViewModel {
     var descriptionText = ""
-    var errorMessage : String?
-    //comes from the species data, stays empty until getdescription finishes
+
+    //audio link to the cry, it gets filled in when the species data loads
     var cryURL : URL?
 
-    //the player has to be saved here, if it was a local var it gets deleted before the sound plays
-    private var player : AVPlayer?
+    //audio the player is saved here bc if it was inside the function it gets deleted before the sound plays
+    var player : AVPlayer?
 
-    //get request to the pokemon species endpoint for the pokedex description
-    func getDescription(number: String) async {
-        errorMessage = nil
-
+    //get request to the pokemon species endpoint, same steps as getpokemon
+    func getDescription(number: String) async throws {
         //save url
         guard let url = URL(string: "https://pokeapi.co/api/v2/pokemon-species/\(number)/")
             else {
-            errorMessage = "Invalid URL."; return}
+            print("invalid url"); return}
 
-        //url req and url call
-        //errors get caught here and turned into a message so the app doesnt crash
-        do {
-            let (data, response) = try await URLSession.shared.data(for: URLRequest(url: url))
-            guard (response as? HTTPURLResponse)?.statusCode == 200 else {
-                errorMessage = "Couldn't load the description."; return}
+        //url req
+        let urlRequest = URLRequest(url: url)
 
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            let species = try decoder.decode(PokemonSpecies.self, from: data)
-            cryURL = species.cryURL
+        //url call
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else { print("error"); return}
 
-            //last english entry bc its from the newest game, the old ones are all caps
-            let entry = species.flavorTextEntries.last { $0.language.name == "en" }
-            //the api text has random line breaks from the old game screens, so swap them for spaces
-            descriptionText = entry?.flavorText
-                .replacingOccurrences(of: "\n", with: " ")
-                .replacingOccurrences(of: "\u{0C}", with: " ")
-                ?? "No description available."
-        } catch {
-            errorMessage = "Couldn't load the description. Check your connection."
-        }
+        let species = try JSONDecoder().decode(PokemonSpecies.self, from: data)
+
+        //last english description bc its from the newest game, swap the line breaks for spaces
+        let english = species.entries.last { $0.language.name == "en" }
+        self.descriptionText = english?.text.replacingOccurrences(of: "\n", with: " ") ?? ""
+
+        //audio the cry comes from pokemon showdown as an mp3 bc the pokeapi cries are ogg and iphones cant play ogg
+        //audio showdown names the files after the pokemon without dashes, so mr mime becomes mrmime
+        let fileName = species.name.replacingOccurrences(of: "-", with: "")
+        self.cryURL = URL(string: "https://play.pokemonshowdown.com/audio/cries/\(fileName).mp3")
     }
 
-    //plays the cry straight from the link, avplayer bc it can stream it without downloading first
+    //audio plays the cry, avplayer streams it straight from the link
     func playCry() {
         guard let url = cryURL else { return }
-        //playback so it still plays when the iphone is on silent
-        try? AVAudioSession.sharedInstance().setCategory(.playback)
         player = AVPlayer(url: url)
         player?.play()
     }

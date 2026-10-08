@@ -41,20 +41,24 @@ struct Pokemon : Identifiable, Decodable{
 //from the pokemon species endpoint, only the parts we need for the description and the cry
 struct PokemonSpecies : Decodable {
     var name : String
-    var flavorTextEntries : [FlavorTextEntry]
+    var entries : [FlavorTextEntry]
 
-    //cry mp3 from pokemon showdown bc the pokeapi cries are ogg and iphones cant play ogg
-    //uses the species name bc showdown names the files that way, without symbols like mr mime becomes mrmime
-    var cryURL : URL? {
-        let fileName = name.filter { $0.isLetter || $0.isNumber }
-        return URL(string: "https://play.pokemonshowdown.com/audio/cries/\(fileName).mp3")
+    //renames the api key to a shorter name, same as hdurl in the nasa project
+    enum CodingKeys: String, CodingKey {
+        case name
+        case entries = "flavor_text_entries"
     }
 }
 
 //one pokedex description, the api has one per game and per language
 struct FlavorTextEntry : Decodable {
-    var flavorText : String
+    var text : String
     var language : Language
+
+    enum CodingKeys: String, CodingKey {
+        case text = "flavor_text"
+        case language
+    }
 }
 
 struct Language : Decodable {
