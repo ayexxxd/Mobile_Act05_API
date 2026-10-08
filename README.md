@@ -42,5 +42,3 @@ The app follows **MVVM**:
 5. Tap any Pokémon to open its detail screen, then tap **Play cry** to hear it.
 
 **Running on a real iPhone:** in the project's **Signing & Capabilities** tab, pick your own Team, then choose your iPhone as the run destination.
-
-**Testing the offline message:** turn off your Mac's Wi-Fi (the simulator uses the Mac's connection) and run the app. The "No connection" message appears; turn Wi-Fi back on and tap **Try again**.
