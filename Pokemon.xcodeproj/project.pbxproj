@@ -60,7 +60,7 @@
 				000000000000000000000010 /* Pokemon */,
 			);
 			name = Pokemon;
-			productName = MyApp;
+			productName = Pokemon;
 			productReference = 000000000000000000000120 /* Pokemon.app */;
 			productType = "com.apple.product-type.application";
 		};
